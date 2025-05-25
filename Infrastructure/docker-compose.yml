@@ -10,30 +10,6 @@ services:
       - db
     networks:
       - weft-network
-  # reverb:
-  #   build: 
-  #     context: ${LARAVEL}
-  #     dockerfile: Dockerfile
-  #   container_name: reverb
-  #   working_dir: /var/www/html
-  #   volumes:
-  #     - ${LARAVEL}/:/var/www/html
-  #   networks:
-  #     - weft-network
-  #   command: ["php", "artisan", "reverb:start"]  
-  #   depends_on:
-  #     - backend  
-  frontend:
-    build: 
-      context: ${REACT}
-      dockerfile: Dockerfile
-    container_name: ${CONTAINER_NAME_REACT}
-    volumes:
-      - ${REACT}/:/app
-    depends_on:
-      - backend
-    networks:
-      - weft-network
   nginx:
     image: nginx:alpine
     container_name: ${CONTAINER_NAME_NGINX}
