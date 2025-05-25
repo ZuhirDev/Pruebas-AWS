@@ -1,43 +1,57 @@
 services:
   backend:
     build: 
-      context: ${LARAVEL}
+      context: ../Backend
       dockerfile: Dockerfile
-    container_name: ${CONTAINER_NAME_LARAVEL}
+    container_name: laravel
     volumes:
-      - ${LARAVEL}/:/var/www/html
+      - ../Backend/:/var/www/html
     depends_on:
       - db
     networks:
       - weft-network
-  nginx:
-    image: nginx:alpine
-    container_name: ${CONTAINER_NAME_NGINX}
-    ports:
-      - "${NGINX_PORT}:80"
+  frontend:
+    build: 
+      context: ../Frontend
+      dockerfile: Dockerfile
+    container_name: react
     volumes:
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
-      - ${LARAVEL}/public:/var/www/html/public
-      - ${REACT}/dist:/var/www/frontend/dist
+      - ../Frontend/:/app
     depends_on:
       - backend
-      - frontend 
     networks:
       - weft-network
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ../Backend/public:/var/www/html/public
+      - ../Frontend/dist:/var/www/frontend/dist
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - weft-network
+
   db:
     image: mysql:8.0
-    container_name: ${MYSQL_CONTAINER_NAME}
+    container_name: mysql
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD} 
+      MYSQL_ROOT_PASSWORD: root
     volumes:
       - db_data:/var/lib/mysql
     networks:
       - weft-network
     ports:
-      - "${MYSQL_PORT}:3306"
+      - "3307:3306"
+
 networks: 
   weft-network:
     driver: bridge
+
 volumes:
   db_data:
     driver: local
